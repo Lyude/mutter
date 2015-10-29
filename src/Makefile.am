@@ -38,6 +38,7 @@ AM_CPPFLAGS = \
 mutter_built_sources = \
 	$(dbus_idle_built_sources)		\
 	$(dbus_display_config_built_sources)	\
+	$(dbus_remote_desktop_built_sources)	\
 	$(dbus_login1_built_sources)		\
 	meta/meta-enum-types.h			\
 	meta-enum-types.c			\
@@ -84,6 +85,8 @@ libmutter_la_SOURCES =				\
 	backends/meta-monitor-manager-private.h	\
 	backends/meta-monitor-manager-dummy.c	\
 	backends/meta-monitor-manager-dummy.h	\
+	backends/meta-remote-desktop.c		\
+	backends/meta-remote-desktop.h		\
 	backends/meta-stage.h			\
 	backends/meta-stage.c			\
 	backends/edid-parse.c			\
@@ -425,6 +428,7 @@ EXTRA_DIST +=					\
 	org.freedesktop.login1.xml		\
 	org.gnome.Mutter.DisplayConfig.xml	\
 	org.gnome.Mutter.IdleMonitor.xml	\
+	org.gnome.Mutter.RemoteDesktop.xml	\
 	$(NULL)
 
 BUILT_SOURCES =					\
@@ -469,6 +473,15 @@ $(dbus_idle_built_sources) : Makefile.am org.gnome.Mutter.IdleMonitor.xml
 		--generate-c-code meta-dbus-idle-monitor				\
 		--c-generate-object-manager						\
 		$(srcdir)/org.gnome.Mutter.IdleMonitor.xml
+
+dbus_remote_desktop_built_sources = meta-dbus-remote-desktop.c meta-dbus-remote-desktop.h
+
+$(dbus_remote_desktop_built_sources) : Makefile.am org.gnome.Mutter.RemoteDesktop.xml
+	$(AM_V_GEN)gdbus-codegen							\
+		--interface-prefix org.gnome.Mutter					\
+		--c-namespace MetaDBus							\
+		--generate-c-code meta-dbus-remote-desktop				\
+		$(srcdir)/org.gnome.Mutter.RemoteDesktop.xml
 
 dbus_login1_built_sources = meta-dbus-login1.c meta-dbus-login1.h
 

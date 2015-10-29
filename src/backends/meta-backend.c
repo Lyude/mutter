@@ -27,9 +27,10 @@
 #include <stdlib.h>
 
 #include <meta/meta-backend.h>
+#include <meta/util.h>
 #include "meta-backend-private.h"
 #include "meta-input-settings-private.h"
-
+#include "backends/meta-remote-desktop.h"
 #include "backends/x11/meta-backend-x11.h"
 #include "meta-cursor-tracker-private.h"
 #include "meta-stage.h"
@@ -62,6 +63,7 @@ struct _MetaBackendPrivate
   MetaMonitorManager *monitor_manager;
   MetaCursorRenderer *cursor_renderer;
   MetaInputSettings *input_settings;
+  MetaRemoteDesktop *remote_desktop;
 
   ClutterActor *stage;
 };
@@ -77,6 +79,7 @@ meta_backend_finalize (GObject *object)
 
   g_clear_object (&priv->monitor_manager);
   g_clear_object (&priv->input_settings);
+  g_clear_object (&priv->remote_desktop);
 
   g_hash_table_destroy (backend->device_monitors);
 
@@ -260,6 +263,19 @@ create_monitor_manager (MetaBackend *backend)
 }
 
 static void
+enable_remote_desktop (MetaBackend *backend)
+{
+#ifdef HAVE_WAYLAND
+  if (meta_is_wayland_compositor ())
+    {
+      MetaBackendPrivate *priv = meta_backend_get_instance_private (backend);
+
+      priv->remote_desktop = g_object_new (META_TYPE_REMOTE_DESKTOP, NULL);
+    }
+#endif
+}
+
+static void
 meta_backend_real_post_init (MetaBackend *backend)
 {
   MetaBackendPrivate *priv = meta_backend_get_instance_private (backend);
@@ -312,6 +328,8 @@ meta_backend_real_post_init (MetaBackend *backend)
   priv->input_settings = meta_input_settings_create ();
 
   center_pointer (backend);
+
+  enable_remote_desktop (backend);
 }
 
 static MetaCursorRenderer *
