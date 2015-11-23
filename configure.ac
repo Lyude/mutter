@@ -81,6 +81,7 @@ MUTTER_PC_MODULES="
    xrender
    x11-xcb
    xcb-randr
+   gstreamer-1.0 >= 1.6
 "
 
 GLIB_GSETTINGS
