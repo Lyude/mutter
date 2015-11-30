@@ -89,6 +89,8 @@ libmutter_la_SOURCES =				\
 	backends/meta-remote-desktop.h		\
 	backends/meta-remote-desktop-session.c	\
 	backends/meta-remote-desktop-session.h	\
+	backends/meta-remote-desktop-src.c	\
+	backends/meta-remote-desktop-src.h	\
 	backends/meta-stage.h			\
 	backends/meta-stage.c			\
 	backends/edid-parse.c			\
