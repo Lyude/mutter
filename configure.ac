@@ -83,6 +83,8 @@ MUTTER_PC_MODULES="
    xcb-randr
    gstreamer-1.0 >= 1.6
    gstreamer-base-1.0 >= 1.6
+   gstreamer-allocators-1.0 >= 1.6
+   gstreamer-plugins-base-1.0 >= 1.6
 "
 
 GLIB_GSETTINGS
