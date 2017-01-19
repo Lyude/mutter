@@ -37,6 +37,7 @@
  *     <logicalmonitor>
  *       <x>0</x>
  *       <y>0</y>
+ *       <scale>1</scale>
  *       <monitor>
  *         <monitorspec>
  *           <connector>LVDS1</connector>
@@ -94,6 +95,7 @@ typedef enum
   STATE_LOGICAL_MONITOR_Y,
   STATE_LOGICAL_MONITOR_PRIMARY,
   STATE_LOGICAL_MONITOR_PRESENTATION,
+  STATE_LOGICAL_MONITOR_SCALE,
   STATE_MONITOR,
   STATE_MONITOR_SPEC,
   STATE_MONITOR_SPEC_CONNECTOR,
@@ -206,6 +208,10 @@ handle_start_element (GMarkupParseContext  *context,
           {
             parser->state = STATE_LOGICAL_MONITOR_Y;
           }
+        else if (g_str_equal (element_name, "scale"))
+          {
+            parser->state = STATE_LOGICAL_MONITOR_SCALE;
+          }
         else if (g_str_equal (element_name, "primary"))
           {
             parser->state = STATE_LOGICAL_MONITOR_PRIMARY;
@@ -232,6 +238,7 @@ handle_start_element (GMarkupParseContext  *context,
 
     case STATE_LOGICAL_MONITOR_X:
     case STATE_LOGICAL_MONITOR_Y:
+    case STATE_LOGICAL_MONITOR_SCALE:
     case STATE_LOGICAL_MONITOR_PRIMARY:
     case STATE_LOGICAL_MONITOR_PRESENTATION:
       {
@@ -525,6 +532,7 @@ handle_end_element (GMarkupParseContext  *context,
     {
     case STATE_LOGICAL_MONITOR_X:
     case STATE_LOGICAL_MONITOR_Y:
+    case STATE_LOGICAL_MONITOR_SCALE:
     case STATE_LOGICAL_MONITOR_PRIMARY:
     case STATE_LOGICAL_MONITOR_PRESENTATION:
       {
@@ -613,6 +621,9 @@ handle_end_element (GMarkupParseContext  *context,
           parser->current_logical_monitor_config;
 
         g_assert (g_str_equal (element_name, "logicalmonitor"));
+
+        if (logical_monitor_config->scale == 0)
+          logical_monitor_config->scale = 1;
 
         if (!verify_logical_monitor_config (logical_monitor_config, error))
           return;
@@ -821,6 +832,23 @@ handle_text (GMarkupParseContext *context,
       {
         read_int (text, text_len,
                   &parser->current_logical_monitor_config->layout.y, error);
+        return;
+      }
+
+    case STATE_LOGICAL_MONITOR_SCALE:
+      {
+        if (!read_int (text, text_len,
+                       &parser->current_logical_monitor_config->scale, error))
+          return;
+
+        if (parser->current_logical_monitor_config->scale <= 0)
+          {
+            g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                         "Logical monitor scale '%d' invalid",
+                         parser->current_logical_monitor_config->scale);
+            return;
+          }
+
         return;
       }
 
