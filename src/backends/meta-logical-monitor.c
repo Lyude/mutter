@@ -26,10 +26,11 @@
 G_DEFINE_TYPE (MetaLogicalMonitor, meta_logical_monitor, G_TYPE_OBJECT)
 
 MetaLogicalMonitor *
-meta_logical_monitor_new (MetaMonitor *monitor,
-                          int          x,
-                          int          y,
-                          int          number)
+meta_logical_monitor_new (MetaMonitor         *monitor,
+                          int                  x,
+                          int                  y,
+                          int                  scale,
+                          int                  number)
 {
   MetaLogicalMonitor *logical_monitor;
   MetaOutput *main_output;
@@ -44,7 +45,7 @@ meta_logical_monitor_new (MetaMonitor *monitor,
   main_output = meta_monitor_get_main_output (monitor);
   logical_monitor->number = number;
   logical_monitor->winsys_id = main_output->winsys_id;
-  logical_monitor->scale = main_output->scale;
+  logical_monitor->scale = scale,
   logical_monitor->in_fullscreen = -1;
 
   logical_monitor->rect.x = x;

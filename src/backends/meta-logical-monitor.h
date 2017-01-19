@@ -62,6 +62,7 @@ G_DECLARE_FINAL_TYPE (MetaLogicalMonitor, meta_logical_monitor,
 MetaLogicalMonitor * meta_logical_monitor_new (MetaMonitor *monitor,
                                                int          x,
                                                int          y,
+                                               int          scale,
                                                int          number);
 
 void meta_logical_monitor_add_monitor (MetaLogicalMonitor *logical_monitor,

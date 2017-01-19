@@ -130,6 +130,7 @@ create_logical_monitor_from_config (MetaMonitorManager       *manager,
   logical_monitor = meta_logical_monitor_new (first_monitor,
                                               logical_monitor_config->layout.x,
                                               logical_monitor_config->layout.y,
+                                              logical_monitor_config->scale,
                                               monitor_number);
 
   /* Add the other monitors. */
@@ -232,10 +233,13 @@ meta_monitor_manager_rebuild_logical_monitors_derived (MetaMonitorManager *manag
       else
         {
           int x, y;
+          int scale;
 
           derive_monitor_position (monitor, &x, &y);
+          scale = meta_monitor_get_calculated_scale (monitor);
           logical_monitor = meta_logical_monitor_new (monitor,
                                                       x, y,
+                                                      scale,
                                                       monitor_number);
           logical_monitors = g_list_append (logical_monitors, logical_monitor);
           monitor_number++;
