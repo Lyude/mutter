@@ -233,10 +233,14 @@ meta_monitor_manager_rebuild_logical_monitors_derived (MetaMonitorManager *manag
       else
         {
           int x, y;
+          MetaMonitorMode *mode;
           int scale;
 
           derive_monitor_position (monitor, &x, &y);
-          scale = meta_monitor_get_calculated_scale (monitor);
+          mode = meta_monitor_get_current_mode (monitor);
+          scale = meta_monitor_manager_calculate_monitor_mode_scale (manager,
+                                                                     monitor,
+                                                                     mode);
           logical_monitor = meta_logical_monitor_new (monitor,
                                                       x, y,
                                                       scale,
@@ -322,6 +326,19 @@ gboolean
 meta_monitor_manager_is_headless (MetaMonitorManager *manager)
 {
   return !manager->monitors;
+}
+
+int
+meta_monitor_manager_calculate_monitor_mode_scale (MetaMonitorManager *manager,
+                                                   MetaMonitor        *monitor,
+                                                   MetaMonitorMode    *monitor_mode)
+{
+  MetaMonitorManagerClass *manager_class =
+    META_MONITOR_MANAGER_GET_CLASS (manager);
+
+  return manager_class->calculate_monitor_mode_scale (manager,
+                                                      monitor,
+                                                      monitor_mode);
 }
 
 static void

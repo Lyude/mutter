@@ -338,6 +338,20 @@ meta_monitor_manager_test_tiled_monitor_removed (MetaMonitorManager *manager,
   manager_test->tiled_monitor_count--;
 }
 
+static int
+meta_monitor_manager_test_calculate_monitor_mode_scale (MetaMonitorManager *manager,
+                                                        MetaMonitor        *monitor,
+                                                        MetaMonitorMode    *monitor_mode)
+{
+  MetaOutput *output;
+  MetaOutputTest *output_test;
+
+  output = meta_monitor_get_main_output (monitor);
+  output_test = output->driver_private;
+
+  return output_test->scale;
+}
+
 static void
 meta_monitor_manager_test_dispose (GObject *object)
 {
@@ -369,4 +383,5 @@ meta_monitor_manager_test_class_init (MetaMonitorManagerTestClass *klass)
   manager_class->apply_configuration = meta_monitor_manager_test_apply_configuration;
   manager_class->tiled_monitor_added = meta_monitor_manager_test_tiled_monitor_added;
   manager_class->tiled_monitor_removed = meta_monitor_manager_test_tiled_monitor_removed;
+  manager_class->calculate_monitor_mode_scale = meta_monitor_manager_test_calculate_monitor_mode_scale;
 }

@@ -44,7 +44,18 @@ struct _MetaMonitorManagerDummyClass
   MetaMonitorManagerClass parent_class;
 };
 
+typedef struct _MetaOutputDummy
+{
+  int scale;
+} MetaOutputDummy;
+
 G_DEFINE_TYPE (MetaMonitorManagerDummy, meta_monitor_manager_dummy, META_TYPE_MONITOR_MANAGER);
+
+static void
+meta_output_dummy_notify_destroy (MetaOutput *output)
+{
+  g_clear_pointer (&output->driver_private, g_free);
+}
 
 static void
 meta_monitor_manager_dummy_read_current (MetaMonitorManager *manager)
@@ -129,6 +140,8 @@ meta_monitor_manager_dummy_read_current (MetaMonitorManager *manager)
 
   for (i = 0; i < num_monitors; i++)
     {
+      MetaOutputDummy *output_dummy;
+
       manager->crtcs[i].crtc_id = i + 1;
       manager->crtcs[i].rect.x = current_x;
       manager->crtcs[i].rect.y = 0;
@@ -142,6 +155,10 @@ meta_monitor_manager_dummy_read_current (MetaMonitorManager *manager)
 
       current_x += manager->crtcs[i].rect.width;
 
+      output_dummy = g_new0 (MetaOutputDummy, 1);
+      *output_dummy = (MetaOutputDummy) {
+        .scale = monitor_scales[i]
+      };
       manager->outputs[i].crtc = &manager->crtcs[i];
       manager->outputs[i].winsys_id = i + 1;
       manager->outputs[i].name = g_strdup_printf ("LVDS%d", i + 1);
@@ -166,7 +183,9 @@ meta_monitor_manager_dummy_read_current (MetaMonitorManager *manager)
       manager->outputs[i].backlight_min = 0;
       manager->outputs[i].backlight_max = 0;
       manager->outputs[i].connector_type = META_CONNECTOR_TYPE_LVDS;
-      manager->outputs[i].scale = monitor_scales[i];
+      manager->outputs[i].driver_private = output_dummy,
+      manager->outputs[i].driver_notify =
+        (GDestroyNotify) meta_output_dummy_notify_destroy;
     }
 }
 
@@ -342,6 +361,20 @@ meta_monitor_manager_dummy_apply_config (MetaMonitorManager *manager,
   meta_monitor_manager_rebuild_derived (manager);
 }
 
+static int
+meta_monitor_manager_dummy_calculate_monitor_mode_scale (MetaMonitorManager *manager,
+                                                         MetaMonitor        *monitor,
+                                                         MetaMonitorMode    *monitor_mode)
+{
+  MetaOutput *output;
+  MetaOutputDummy *output_dummy;
+
+  output = meta_monitor_get_main_output (monitor);
+  output_dummy = output->driver_private;
+
+  return output_dummy->scale;
+}
+
 static void
 meta_monitor_manager_dummy_class_init (MetaMonitorManagerDummyClass *klass)
 {
@@ -351,6 +384,7 @@ meta_monitor_manager_dummy_class_init (MetaMonitorManagerDummyClass *klass)
   manager_class->ensure_initial_config = meta_monitor_manager_dummy_ensure_initial_config;
   manager_class->apply_monitors_config = meta_monitor_manager_dummy_apply_monitors_config;
   manager_class->apply_configuration = meta_monitor_manager_dummy_apply_config;
+  manager_class->calculate_monitor_mode_scale = meta_monitor_manager_dummy_calculate_monitor_mode_scale;
 }
 
 static void
