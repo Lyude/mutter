@@ -336,7 +336,6 @@
 
 	@max_screen_size represents the maximum size the screen may have, or 0x0 if no
 	such limit is known.
-
     -->
     <method name="GetCurrentState">
       <arg name="serial" direction="out" type="u" />
