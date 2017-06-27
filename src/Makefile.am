@@ -71,6 +71,7 @@ mutter_built_sources += \
 	tablet-unstable-v2-server-protocol.h				\
 	xdg-foreign-unstable-v1-protocol.c				\
 	xdg-foreign-unstable-v1-server-protocol.h			\
+	wayland-eglstream-controller-server-protocol.h			\
 	$(NULL)
 endif
 

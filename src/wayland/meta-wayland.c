@@ -41,6 +41,7 @@
 #include "meta-wayland-data-device.h"
 #include "meta-wayland-tablet-manager.h"
 #include "meta-wayland-xdg-foreign.h"
+#include "meta-wayland-egl-stream.h"
 
 static MetaWaylandCompositor _meta_wayland_compositor;
 static char *_display_name_override;
@@ -355,6 +356,10 @@ meta_wayland_init (void)
   meta_wayland_relative_pointer_init (compositor);
   meta_wayland_pointer_constraints_init (compositor);
   meta_wayland_xdg_foreign_init (compositor);
+
+#ifdef HAVE_EGL_DEVICE
+  meta_wayland_eglstream_controller_init (compositor);
+#endif
 
   if (!meta_xwayland_start (&compositor->xwayland_manager, compositor->wayland_display))
     g_error ("Failed to start X Wayland");
